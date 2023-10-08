@@ -4,6 +4,11 @@
  */
 package ui;
 
+import java.security.NoSuchAlgorithmException;
+import javax.swing.JOptionPane;
+import security.PasswordHasher;
+import security.RegistrationValidator;
+import security.UserDAO;
 /**
  *
  * @author GHOST
@@ -36,11 +41,11 @@ public class SignUpUI extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jPasswordField2 = new javax.swing.JPasswordField();
+        NameSIGN = new javax.swing.JTextField();
+        UserSIGN = new javax.swing.JTextField();
+        MailSign = new javax.swing.JTextField();
+        PasswdSign = new javax.swing.JPasswordField();
+        PasswdSign0 = new javax.swing.JPasswordField();
         BtnSignUp = new javax.swing.JButton();
         BtnBack = new javax.swing.JButton();
 
@@ -104,15 +109,15 @@ public class SignUpUI extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
         jLabel8.setText("CONFIRM PASSWORD:");
 
-        jTextField1.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        NameSIGN.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
 
-        jTextField2.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        UserSIGN.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
 
-        jTextField3.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        MailSign.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
 
-        jPasswordField1.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        PasswdSign.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
 
-        jPasswordField2.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        PasswdSign0.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
 
         BtnSignUp.setText("SIGN UP");
         BtnSignUp.addActionListener(new java.awt.event.ActionListener() {
@@ -140,7 +145,7 @@ public class SignUpUI extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(15, 15, 15)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(UserSIGN, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel5)
@@ -150,10 +155,10 @@ public class SignUpUI extends javax.swing.JFrame {
                                     .addComponent(jLabel8)
                                     .addComponent(jLabel4))
                                 .addGap(172, 172, 172))
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPasswordField2, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(MailSign, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(PasswdSign, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(PasswdSign0, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(NameSIGN, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(63, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(38, 38, 38)
@@ -170,23 +175,23 @@ public class SignUpUI extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addComponent(jLabel4)
                 .addGap(9, 9, 9)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(NameSIGN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(UserSIGN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16)
                 .addComponent(jLabel6)
                 .addGap(5, 5, 5)
-                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(MailSign, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
                 .addComponent(jLabel7)
                 .addGap(3, 3, 3)
-                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(PasswdSign, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPasswordField2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(PasswdSign0, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BtnSignUp, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -223,7 +228,33 @@ public class SignUpUI extends javax.swing.JFrame {
     }//GEN-LAST:event_BtnBackActionPerformed
 
     private void BtnSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSignUpActionPerformed
-        // TODO add your handling code here:
+        String fullName = NameSIGN.getText();
+        String username = UserSIGN.getText();
+        String email = MailSign.getText();
+        String password = PasswdSign.getText();
+        String confirmPassword = PasswdSign0.getText();
+
+    try {
+        String hashedPassword = PasswordHasher.hashPassword(password);
+
+        boolean isValid = RegistrationValidator.validateFields(fullName, username, password, confirmPassword, email);
+
+        if (isValid) {
+            UserDAO userDAO = new UserDAO();
+            userDAO.insertUser(fullName, username, hashedPassword, email);
+            JOptionPane.showMessageDialog(this, "Registro completo");
+
+            NameSIGN.setText("");
+            UserSIGN.setText("");
+            MailSign.setText("");
+            PasswdSign.setText("");
+            PasswdSign0.setText("");
+        } else {
+            JOptionPane.showMessageDialog(this, "Los campos no son válidos");
+        }
+    } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+    }
     }//GEN-LAST:event_BtnSignUpActionPerformed
 
     /**
@@ -264,6 +295,11 @@ public class SignUpUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnBack;
     private javax.swing.JButton BtnSignUp;
+    private javax.swing.JTextField MailSign;
+    private javax.swing.JTextField NameSIGN;
+    private javax.swing.JPasswordField PasswdSign;
+    private javax.swing.JPasswordField PasswdSign0;
+    private javax.swing.JTextField UserSIGN;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -274,10 +310,5 @@ public class SignUpUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JPasswordField jPasswordField2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
 }

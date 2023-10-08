@@ -12,30 +12,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegistrationValidator {
-
     public static boolean validateFields(String fullName, String username, String password, String confirmPassword, String email) {
-        // Verificar campos vacíos
-        if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()) {
-            return false;
-        }
+        return isFullNameValid(fullName) &&
+               isUsernameValid(username) &&
+               isPasswordValid(password) &&
+               arePasswordsMatching(password, confirmPassword) &&
+               isEmailValid(email);
+    }
 
-        // Verificar si las contraseñas coinciden
-        if (!password.equals(confirmPassword)) {
-            return false;
-        }
+    public static boolean isFullNameValid(String fullName) {
+        return !fullName.isEmpty();
+    }
 
-        // Verificar fortaleza de la contraseña (al menos un número, una minúscula, una mayúscula y un símbolo)
-        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$";
-        Pattern pattern = Pattern.compile(passwordPattern);
-        Matcher matcher = pattern.matcher(password);
-        if (!matcher.matches()) {
-            return false;
-        }
+    public static boolean isUsernameValid(String username) {
+        return !username.isEmpty();
+    }
 
-        // Verificar el formato del correo electrónico
-        String emailPattern = "^[A-Za-z0-9+_.-]+@(.+)$";
-        pattern = Pattern.compile(emailPattern);
-        matcher = pattern.matcher(email);
-        return matcher.matches();
+    public static boolean isPasswordValid(String password) {
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
+    }
+
+    public static boolean arePasswordsMatching(String password, String confirmPassword) {
+        return password.equals(confirmPassword);
+    }
+
+    public static boolean isEmailValid(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
 }
