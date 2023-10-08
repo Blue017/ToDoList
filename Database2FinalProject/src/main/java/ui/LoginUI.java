@@ -6,8 +6,10 @@ package ui;
 
 import com.mongodb.client.MongoDatabase;
 import database.MongoDBConnection;
+import java.security.NoSuchAlgorithmException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import security.PasswordHasher;
 import security.UserValidator;
 
 /**
@@ -196,18 +198,24 @@ public class LoginUI extends javax.swing.JFrame {
     }//GEN-LAST:event_SignUPActionPerformed
 
     private void BtnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLoginActionPerformed
-         String username = TxtUser.getText();
+        String username = TxtUser.getText();
         String password = new String(TxtPasswd.getPassword());
 
-    MongoDatabase database = MongoDBConnection.getDatabase();
+        try {
+            String hashedPassword = PasswordHasher.hashPassword(password);
 
-    UserValidator userValidator = new UserValidator(database);
+            MongoDatabase database = MongoDBConnection.getDatabase();
 
-    if (userValidator.validateUser(username, password)) {
-        JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
-    } else {
-        JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intenta de nuevo.");
-    }   
+            UserValidator userValidator = new UserValidator(database);
+
+            if (userValidator.validateUser(username, hashedPassword)) {
+                JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intenta de nuevo.");
+            }   
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } 
     }//GEN-LAST:event_BtnLoginActionPerformed
 
     /**

@@ -16,7 +16,7 @@ public class UserValidator {
     public boolean validateUser(String username, String password) {
         MongoCollection<Document> userCollection = database.getCollection("users");
 
-        Document query = new Document("username", username)
+        Document query = new Document("userName", username)
                 .append("password", password);
 
         try {
