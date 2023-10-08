@@ -1,18 +1,18 @@
 package database;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+
 public class MongoDBConnection {
-    private static MongoDatabase database;
+    private static final String MONGODB_URI = "mongodb+srv://carlosGG:16LSZHC9riwyKF3K@cluster0.jwjnejd.mongodb.net/?retryWrites=true&w=majority";
+    private static final String DATABASE_NAME = "University";
 
-        public static void connect() {
-            MongoClientURI uri = new MongoClientURI("");
-            MongoClient mongoClient = new MongoClient(uri);
-            database = mongoClient.getDatabase("");
-        }
-
-        public static MongoDatabase getDatabase() {
-            return database;
-        }
+    public static MongoClient connect() {
+        return MongoClients.create(MONGODB_URI);
     }
 
+    public static MongoDatabase getDatabase() {
+        MongoClient mongoClient = connect();
+        return mongoClient.getDatabase(DATABASE_NAME);
+    }
+}
