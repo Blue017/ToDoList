@@ -7,9 +7,12 @@ package ui;
 import com.mongodb.client.MongoDatabase;
 import database.MongoDBConnection;
 import java.security.NoSuchAlgorithmException;
+import javax.servlet.http.HttpSession;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.apache.struts2.ServletActionContext;
 import security.PasswordHasher;
+import security.SessionManager;
 import security.UserValidator;
 
 /**
@@ -198,18 +201,23 @@ public class LoginUI extends javax.swing.JFrame {
     }//GEN-LAST:event_SignUPActionPerformed
 
     private void BtnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLoginActionPerformed
-        String username = TxtUser.getText();
-        String password = new String(TxtPasswd.getPassword());
+    String username = TxtUser.getText();
+    String password = new String(TxtPasswd.getPassword());
 
-        try {
-            String hashedPassword = PasswordHasher.hashPassword(password);
+    try {
+        String hashedPassword = PasswordHasher.hashPassword(password);
 
-            MongoDatabase database = MongoDBConnection.getDatabase();
+        MongoDatabase database = MongoDBConnection.getDatabase();
 
-            UserValidator userValidator = new UserValidator(database);
+        UserValidator userValidator = new UserValidator(database);
 
-            if (userValidator.validateUser(username, hashedPassword)) {
-                JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
+        if (userValidator.validateUser(username, hashedPassword)) {
+            SessionManager.setLoggedInUsername(username);
+            JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
+              // Crear e invocar la ventana del menú principal
+            MainMenuUI mainMenu = new MainMenuUI();
+            mainMenu.setVisible(true);
+            this.dispose(); // Cierra la ventana de inicio de sesión actual si es necesario
             } else {
                 JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intenta de nuevo.");
             }   

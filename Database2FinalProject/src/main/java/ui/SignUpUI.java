@@ -239,16 +239,20 @@ public class SignUpUI extends javax.swing.JFrame {
 
         boolean isValid = RegistrationValidator.validateFields(fullName, username, password, confirmPassword, email);
 
-        if (isValid) {
+            if (isValid) {
             UserDAO userDAO = new UserDAO();
-            userDAO.insertUser(fullName, username, hashedPassword, email);
-            JOptionPane.showMessageDialog(this, "Registro completo");
 
-            NameSIGN.setText("");
-            UserSIGN.setText("");
-            MailSign.setText("");
-            PasswdSign.setText("");
-            PasswdSign0.setText("");
+            if (userDAO.isUsernameExists(username)) {
+                JOptionPane.showMessageDialog(this, "El nombre de usuario ya existe. Por favor, elija otro.");
+            } else {
+                userDAO.insertUser(fullName, username, hashedPassword, email);
+                JOptionPane.showMessageDialog(this, "Registro completo");
+                NameSIGN.setText("");
+                UserSIGN.setText("");
+                MailSign.setText("");
+                PasswdSign.setText("");
+                PasswdSign0.setText("");
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Los campos no son válidos");
         }
