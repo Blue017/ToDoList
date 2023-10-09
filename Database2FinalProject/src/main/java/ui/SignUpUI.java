@@ -223,7 +223,14 @@ public class SignUpUI extends javax.swing.JFrame {
 
     private void BtnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnBackActionPerformed
         LoginUI signupFrame = new LoginUI();
+        
         signupFrame.setVisible(true);
+        
+        signupFrame.setSize(800, 500);
+        
+        signupFrame.setLocationRelativeTo(null);
+        
+        signupFrame.setResizable(false);
         this.dispose();
     }//GEN-LAST:event_BtnBackActionPerformed
 

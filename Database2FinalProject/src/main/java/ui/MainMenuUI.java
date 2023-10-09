@@ -15,20 +15,30 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import model.TaskList;
 import model.TaskListManager;
+import model.TaskListTableModel;
 import org.apache.struts2.ServletActionContext;
 import org.bson.Document;
 import security.SessionManager;
 import security.TaskListDAO;
+import javax.swing.JLabel;
+
 /**
  *
  * @author GHOST
  */
 public class MainMenuUI extends javax.swing.JFrame {
-private List<TaskList> taskLists = new ArrayList<>();
+    private TaskListTableModel tableModel;
+    private List<TaskList> taskLists = new ArrayList<>();
     private TaskListManager taskListManager;
+    String loggedInUsername = SessionManager.getLoggedInUsername();
+    String welcomeMessage = "Welcome " + loggedInUsername;
 
     public MainMenuUI() {
         initComponents();
+
+        tableModel = new TaskListTableModel(new Object[]{"List Name", "Description"}, 0);
+        jLabelWelcome.setText(welcomeMessage);
+        jTableTaskList.setModel(tableModel);
         taskListManager = new TaskListManager(JListTask, "LISTAS DE TAREAS");
         taskListManager.refreshTaskLists();
         cargarListasDeTareasDelUsuario();
@@ -42,13 +52,11 @@ private void cargarListasDeTareasDelUsuario() {
         
         List<TaskList> listasDeTareas = taskListDAO.getListasDeTareasPorUsuario(loggedInUsername);
 
-        DefaultListModel<String> listModel = new DefaultListModel<>();
+        tableModel.setRowCount(0);
 
         for (TaskList listaDeTareas : listasDeTareas) {
-            listModel.addElement(listaDeTareas.getName());
+            tableModel.addRow(new Object[]{listaDeTareas.getName(), listaDeTareas.getDescription()});
         }
-
-        JListTask.setModel(listModel);
     }
 }
 
@@ -65,9 +73,12 @@ private void cargarListasDeTareasDelUsuario() {
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         PanelListas = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTableTaskList = new javax.swing.JTable();
         jScrollPane1 = new javax.swing.JScrollPane();
         JListTask = new javax.swing.JList<>();
-        jButton2 = new javax.swing.JButton();
+        jLabelWelcome = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(800, 600));
@@ -76,12 +87,11 @@ private void cargarListasDeTareasDelUsuario() {
         jPanel1.setMaximumSize(new java.awt.Dimension(0, 0));
         jPanel1.setPreferredSize(new java.awt.Dimension(700, 600));
 
-        jLabel1.setFont(new java.awt.Font("Courier New", 1, 24)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Courier New", 1, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("ToDo List");
 
-        jButton1.setBackground(new java.awt.Color(153, 153, 153));
         jButton1.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
         jButton1.setText("LOG OUT");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -92,9 +102,6 @@ private void cargarListasDeTareasDelUsuario() {
 
         PanelListas.setBackground(new java.awt.Color(255, 255, 255));
 
-        JListTask.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-        jScrollPane1.setViewportView(JListTask);
-
         jButton2.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
         jButton2.setText("NEW LIST");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -103,65 +110,101 @@ private void cargarListasDeTareasDelUsuario() {
             }
         });
 
+        jTableTaskList.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
+        jTableTaskList.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Name", "Description"
+            }
+        ));
+        jScrollPane2.setViewportView(jTableTaskList);
+
         javax.swing.GroupLayout PanelListasLayout = new javax.swing.GroupLayout(PanelListas);
         PanelListas.setLayout(PanelListasLayout);
         PanelListasLayout.setHorizontalGroup(
             PanelListasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelListasLayout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 630, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .addGroup(PanelListasLayout.createSequentialGroup()
-                .addGap(234, 234, 234)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(PanelListasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelListasLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 961, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(PanelListasLayout.createSequentialGroup()
+                        .addGap(60, 60, 60)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         PanelListasLayout.setVerticalGroup(
             PanelListasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelListasLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(21, 21, 21)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
+
+        JListTask.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
+        jScrollPane1.setViewportView(JListTask);
+
+        jLabelWelcome.setFont(new java.awt.Font("Courier New", 3, 24)); // NOI18N
+        jLabelWelcome.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelWelcome.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(115, 115, 115)
-                .addComponent(jButton1)
-                .addGap(34, 34, 34))
+                .addContainerGap(48, Short.MAX_VALUE)
+                .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
-                .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(jLabelWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(104, 104, 104)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(47, 47, 47))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(12, 12, 12)
-                .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabelWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel1))
+                                .addGap(13, 13, 13)))
+                        .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 949, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1077, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 631, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -171,6 +214,16 @@ private void cargarListasDeTareasDelUsuario() {
         SessionManager.setLoggedInUsername(null);
         this.dispose();
         LoginUI loginUI = new LoginUI();
+                loginUI.setSize(800, 500); // Reemplaza 'ancho' y 'alto' con los valores deseados
+        
+        // Centrar la ventana en la pantalla
+        loginUI.setLocationRelativeTo(null);
+        
+        // Deshabilitar la opción de maximizar
+        loginUI.setResizable(false);
+        
+        // Hacer visible el JFrame LoginUI
+        loginUI.setVisible(true);
         loginUI.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -243,7 +296,10 @@ private void cargarListasDeTareasDelUsuario() {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelWelcome;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTableTaskList;
     // End of variables declaration//GEN-END:variables
 }
