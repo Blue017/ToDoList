@@ -54,5 +54,13 @@ public class TaskListDAO {
 
         return listasDeTareas;
     }
+    
+    public boolean checkIfListExists(String listName, String username) {
+        
+        Document query = new Document("userName", username).append("listName", listName);
+        return taskListCollection.countDocuments(query) > 0;
+        
+    }
+
 
 }

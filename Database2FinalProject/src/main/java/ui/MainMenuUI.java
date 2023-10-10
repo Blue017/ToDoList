@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import model.TaskList;
 import model.TaskListManager;
@@ -122,6 +123,11 @@ private void cargarListasDeTareasDelUsuario() {
                 "Name", "Description"
             }
         ));
+        jTableTaskList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableTaskListMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(jTableTaskList);
 
         javax.swing.GroupLayout PanelListasLayout = new javax.swing.GroupLayout(PanelListas);
@@ -134,16 +140,16 @@ private void cargarListasDeTareasDelUsuario() {
                         .addGap(17, 17, 17)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 961, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(PanelListasLayout.createSequentialGroup()
-                        .addGap(60, 60, 60)
+                        .addGap(404, 404, 404)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         PanelListasLayout.setVerticalGroup(
             PanelListasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelListasLayout.createSequentialGroup()
-                .addGap(21, 21, 21)
+                .addGap(15, 15, 15)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(12, Short.MAX_VALUE))
         );
@@ -160,18 +166,21 @@ private void cargarListasDeTareasDelUsuario() {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(48, Short.MAX_VALUE)
-                .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
-                .addComponent(jLabelWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(104, 104, 104)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(47, 47, 47))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(40, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabelWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(74, 74, 74)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(85, 85, 85))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -181,17 +190,14 @@ private void cargarListasDeTareasDelUsuario() {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabelWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel1))
-                                .addGap(13, 13, 13)))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel1)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabelWelcome, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(14, 14, 14)
                         .addComponent(PanelListas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(9, 9, 9)))
-                .addContainerGap(34, Short.MAX_VALUE))
+                        .addGap(10, 10, 10)))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -223,36 +229,59 @@ private void cargarListasDeTareasDelUsuario() {
         loginUI.setResizable(false);
         
         // Hacer visible el JFrame LoginUI
-        loginUI.setVisible(true);
+        loginUI.setVisible(true); 
         loginUI.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-     String listName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la lista:");
+    String listName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la lista:");
 
     if (listName != null && !listName.isEmpty()) {
-        String description = JOptionPane.showInputDialog(this, "Ingrese la descripción de la lista:");
+        // Obtén el nombre de usuario desde SessionManager
+        String loggedInUsername = SessionManager.getLoggedInUsername();
 
-        if (description != null) {
-            // Obtén el nombre de usuario desde SessionManager
-            String loggedInUsername = SessionManager.getLoggedInUsername();
+        if (loggedInUsername != null) {
+            TaskListDAO taskListDAO = new TaskListDAO();
 
-            if (loggedInUsername != null) {
-                TaskListDAO taskListDAO = new TaskListDAO();
-                taskListDAO.insertTaskList(listName, description, loggedInUsername);
-                taskListManager.refreshTaskLists();
-                cargarListasDeTareasDelUsuario();
+            // Verificar si ya existe una lista con el mismo nombre y perteneciente al mismo usuario
+            boolean listaExistente = taskListDAO.checkIfListExists(listName, loggedInUsername);
 
+            if (listaExistente) {
+                JOptionPane.showMessageDialog(this, "Ya existe una lista con este nombre para el usuario actual. Por favor, elija otro nombre.");
             } else {
-                JOptionPane.showMessageDialog(this, "No se ha iniciado sesión.");
+                String description = JOptionPane.showInputDialog(this, "Ingrese la descripción de la lista:");
+
+                if (description != null) {
+                    // Continuar con la creación de la lista
+                    taskListDAO.insertTaskList(listName, description, loggedInUsername);
+                    taskListManager.refreshTaskLists();
+                    cargarListasDeTareasDelUsuario();
+                } else {
+                    JOptionPane.showMessageDialog(this, "La descripción no puede estar vacía.");
+                }
             }
         } else {
-            JOptionPane.showMessageDialog(this, "La descripción no puede estar vacía.");
+            JOptionPane.showMessageDialog(this, "No se ha iniciado sesión.");
         }
     } else {
         JOptionPane.showMessageDialog(this, "El nombre de la lista no puede estar vacío.");
     }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTableTaskListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTaskListMouseClicked
+          if (evt.getClickCount() == 1) {
+        int selectedRow = jTableTaskList.getSelectedRow();
+        if (selectedRow != -1) {
+            String listName = (String) jTableTaskList.getValueAt(selectedRow, 0);
+            String description = (String) jTableTaskList.getValueAt(selectedRow, 1);
+            TaskUI taskUI = new TaskUI(listName, description);
+            taskUI.setVisible(true);
+            taskUI.setSize(1037, 663);
+            taskUI.setLocationRelativeTo(null);
+            taskUI.setLocationRelativeTo(this);
+        }
+    }
+    }//GEN-LAST:event_jTableTaskListMouseClicked
 
     /**
      * @param args the command line arguments
