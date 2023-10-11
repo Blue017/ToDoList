@@ -1,15 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package security;
 
-/**
- *
- * @author GHOST
- */
+import org.bson.types.ObjectId; // Importa la clase ObjectId desde la librería de MongoDB
+
 public class SessionManager {
     private static String loggedInUsername;
+    private static ObjectId loggedInUserId; // Cambiado a ObjectId para almacenar el ObjectId del usuario logueado
 
     public static void setLoggedInUsername(String username) {
         loggedInUsername = username;
@@ -17,5 +12,14 @@ public class SessionManager {
 
     public static String getLoggedInUsername() {
         return loggedInUsername;
+    }
+
+    // Métodos para manejar el ObjectId del usuario logueado
+    public static void setLoggedInUserId(ObjectId userId) {
+        loggedInUserId = userId;
+    }
+
+    public static ObjectId getLoggedInUserId() {
+        return loggedInUserId;
     }
 }

@@ -22,6 +22,7 @@ import org.bson.Document;
 import security.SessionManager;
 import security.TaskListDAO;
 import javax.swing.JLabel;
+import org.bson.types.ObjectId;
 
 /**
  *
@@ -237,14 +238,14 @@ private void cargarListasDeTareasDelUsuario() {
     String listName = JOptionPane.showInputDialog(this, "Ingrese el nombre de la lista:");
 
     if (listName != null && !listName.isEmpty()) {
-        // Obtén el nombre de usuario desde SessionManager
-        String loggedInUsername = SessionManager.getLoggedInUsername();
+        // Obtén el ID de usuario desde SessionManager
+        ObjectId loggedInUserId = SessionManager.getLoggedInUserId();
 
-        if (loggedInUsername != null) {
+        if (loggedInUserId != null) {
             TaskListDAO taskListDAO = new TaskListDAO();
 
             // Verificar si ya existe una lista con el mismo nombre y perteneciente al mismo usuario
-            boolean listaExistente = taskListDAO.checkIfListExists(listName, loggedInUsername);
+            boolean listaExistente = taskListDAO.checkIfListExists(listName, loggedInUserId);
 
             if (listaExistente) {
                 JOptionPane.showMessageDialog(this, "Ya existe una lista con este nombre para el usuario actual. Por favor, elija otro nombre.");
@@ -253,7 +254,7 @@ private void cargarListasDeTareasDelUsuario() {
 
                 if (description != null) {
                     // Continuar con la creación de la lista
-                    taskListDAO.insertTaskList(listName, description, loggedInUsername);
+                    taskListDAO.insertTaskList(listName, description, loggedInUserId);
                     taskListManager.refreshTaskLists();
                     cargarListasDeTareasDelUsuario();
                 } else {
@@ -270,17 +271,17 @@ private void cargarListasDeTareasDelUsuario() {
 
     private void jTableTaskListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTaskListMouseClicked
           if (evt.getClickCount() == 1) {
-        int selectedRow = jTableTaskList.getSelectedRow();
-        if (selectedRow != -1) {
-            String listName = (String) jTableTaskList.getValueAt(selectedRow, 0);
-            String description = (String) jTableTaskList.getValueAt(selectedRow, 1);
-            TaskUI taskUI = new TaskUI(listName, description);
-            taskUI.setVisible(true);
-            taskUI.setSize(1037, 663);
-            taskUI.setLocationRelativeTo(null);
-            taskUI.setLocationRelativeTo(this);
+            int selectedRow = jTableTaskList.getSelectedRow();
+            if (selectedRow != -1) {
+                String listName = (String) jTableTaskList.getValueAt(selectedRow, 0);
+                String description = (String) jTableTaskList.getValueAt(selectedRow, 1);
+                TaskUI taskUI = new TaskUI(listName, description);
+                taskUI.setVisible(true);
+                taskUI.setSize(1037, 663);
+                taskUI.setLocationRelativeTo(null);
+                taskUI.setLocationRelativeTo(this);
+            }
         }
-    }
     }//GEN-LAST:event_jTableTaskListMouseClicked
 
     /**

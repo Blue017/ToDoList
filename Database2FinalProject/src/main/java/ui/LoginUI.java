@@ -11,6 +11,8 @@ import javax.servlet.http.HttpSession;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.struts2.ServletActionContext;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import security.PasswordHasher;
 import security.SessionManager;
 import security.UserValidator;
@@ -214,8 +216,15 @@ public class LoginUI extends javax.swing.JFrame {
 
         UserValidator userValidator = new UserValidator(database);
 
-        if (userValidator.validateUser(username, hashedPassword)) {
+        // Realiza una consulta para obtener el usuario por nombre de usuario
+        Document userDocument = userValidator.getUserDocumentByUsername(username);
+
+        if (userDocument != null && userValidator.validateUser(username, hashedPassword)) {
+            // Obtiene el ObjectId del usuario
+            ObjectId userId = userDocument.getObjectId("_id");
+
             SessionManager.setLoggedInUsername(username);
+            SessionManager.setLoggedInUserId(userId);
             JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
               // Crear e invocar la ventana del menú principal
             MainMenuUI mainMenu = new MainMenuUI();

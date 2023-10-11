@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.TaskList;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class TaskListDAO {
     private final MongoDatabase database;
@@ -27,14 +28,15 @@ public class TaskListDAO {
         taskListCollection = database.getCollection("TaskList");
     }
 
-    public void insertTaskList(String listName, String description, String username) {
+    public void insertTaskList(String listName, String description, ObjectId userId) {
         Document taskListDocument = new Document();
-        taskListDocument.append("userName", username);
+        taskListDocument.append("userId", userId);
         taskListDocument.append("listName", listName);
         taskListDocument.append("description", description);
 
         taskListCollection.insertOne(taskListDocument);
     }
+
     public List<TaskList> getListasDeTareasPorUsuario(String username) {
         List<TaskList> listasDeTareas = new ArrayList<>();
 
@@ -55,12 +57,11 @@ public class TaskListDAO {
         return listasDeTareas;
     }
     
-    public boolean checkIfListExists(String listName, String username) {
-        
-        Document query = new Document("userName", username).append("listName", listName);
+    public boolean checkIfListExists(String listName, ObjectId userId) {
+        Document query = new Document("userId", userId).append("listName", listName);
         return taskListCollection.countDocuments(query) > 0;
-        
     }
+
 
 
 }
