@@ -16,8 +16,11 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import static database.MongoDBConnection.connect;
 import static database.MongoDBConnection.getDatabase;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import model.Task;
 import model.TaskListTableModel;
@@ -32,6 +35,8 @@ import security.TaskDAO;
  */
 public class TaskUI extends javax.swing.JFrame {
     private String nameList;
+    private List<ObjectId> taskIds = new ArrayList<>();
+    private Timer timer;
 
 
     /**
@@ -41,6 +46,7 @@ public class TaskUI extends javax.swing.JFrame {
             this.nameList = listName;
             initComponents();
             loadTasks(listName);
+            initializeTimer(); 
     }
     private void loadTasks(String listName) {
         // Conecta a la base de datos y obtén la colección "Task"
@@ -61,7 +67,8 @@ public class TaskUI extends javax.swing.JFrame {
         FindIterable<Document> documents = collection.find(filter);
 
         for (Document document : documents) {
-            // Obtén los valores de las columnas de cada documento
+            ObjectId id = document.getObjectId("_id");
+            taskIds.add(id);
             String name = document.getString("name");
             String startDate = document.getString("startDate");
             String endDate = document.getString("endDate");
@@ -78,7 +85,21 @@ public class TaskUI extends javax.swing.JFrame {
         // Cierra la conexión a MongoDB
         mongoClient.close();
   }
-
+        private void initializeTimer() {
+            int delay = 60000;  // Intervalo en milisegundos (ejemplo: 60 segundos)
+            ActionListener taskPerformer = new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    // Llama a loadTasks para cargar nuevamente los datos
+                    loadTasks(nameList);
+                }
+            };
+            timer = new Timer(delay, taskPerformer);
+            timer.setRepeats(true);  // El temporizador se repetirá
+            timer.start();  // Inicia el temporizador
+        }
+    private ObjectId getIdForSelectedRow(int selectedRow) {
+        return taskIds.get(selectedRow);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -94,7 +115,7 @@ public class TaskUI extends javax.swing.JFrame {
         jTableTasks = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
         jLabelNombreLista = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jButtonBack = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -102,17 +123,17 @@ public class TaskUI extends javax.swing.JFrame {
 
         jTableTasks.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "NAME", "START DATE", "END DATE", "DESCRIPTION", "STATUS"
+                "ID", "NAME", "START DATE", "END DATE", "DESCRIPTION", "STATUS"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -141,8 +162,13 @@ public class TaskUI extends javax.swing.JFrame {
         jLabelNombreLista.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelNombreLista.setText("TASK");
 
-        jButton1.setFont(new java.awt.Font("Courier New", 3, 24)); // NOI18N
-        jButton1.setText("EDIT");
+        jButtonBack.setFont(new java.awt.Font("Courier New", 3, 24)); // NOI18N
+        jButtonBack.setText("Back");
+        jButtonBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonBackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -156,7 +182,7 @@ public class TaskUI extends javax.swing.JFrame {
                 .addGap(183, 183, 183)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonBack, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(227, 227, 227))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(305, 305, 305)
@@ -173,7 +199,7 @@ public class TaskUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonBack, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -205,8 +231,37 @@ public class TaskUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTableTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTasksMouseClicked
+    // Obtén la fila seleccionada
+    int selectedRow = jTableTasks.getSelectedRow();
 
+    // Asegúrate de que se haya seleccionado una fila
+    if (selectedRow >= 0) {
+        // Obtén los valores de la fila seleccionada
+        String name = jTableTasks.getValueAt(selectedRow, 0).toString();
+        String startDate = jTableTasks.getValueAt(selectedRow, 1).toString();
+        String endDate = jTableTasks.getValueAt(selectedRow, 2).toString();
+        String description = jTableTasks.getValueAt(selectedRow, 3).toString();
+        String status = jTableTasks.getValueAt(selectedRow, 4).toString();
+
+        // Obtén la ID del documento asociado a la fila seleccionada
+        ObjectId id = getIdForSelectedRow(selectedRow);
+
+        // Crea una nueva instancia de la ventana de detalles y pásale los valores
+        TaskUpdateUI taskDetailsUI = new TaskUpdateUI(name, startDate, endDate, description, status, id);
+        // Configura la ventana para que no sea redimensionable
+        taskDetailsUI.setResizable(false);
+
+        // Centra la ventana en el medio de la pantalla
+        taskDetailsUI.setLocationRelativeTo(null);
+        // Haz que la nueva ventana sea visible
+        taskDetailsUI.setVisible(true);
+    }
     }//GEN-LAST:event_jTableTasksMouseClicked
+
+    private void jButtonBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBackActionPerformed
+    nameList = "";
+    this.dispose();
+    }//GEN-LAST:event_jButtonBackActionPerformed
 
     /**
      * @param args the command line arguments
@@ -241,8 +296,8 @@ public class TaskUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButtonBack;
     private javax.swing.JLabel jLabelNombreLista;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;

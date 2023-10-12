@@ -4,28 +4,54 @@
  */
 package ui;
 
+import ui.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.UpdateResult;
 import static database.MongoDBConnection.connect;
 import static database.MongoDBConnection.getDatabase;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 /**
  *
  * @author GHOST
  */
-public class TaskEditUI extends javax.swing.JFrame {
-    private String listName;
+public class TaskUpdateUI extends javax.swing.JFrame {
+
+    private String name;
+    private String startDate;
+    private String endDate;
+    private String description;
+    private String status;
+    private ObjectId id;
     /**
      * Creates new form TaskEditUI
      */
-    public TaskEditUI(String nameList) {
+    public TaskUpdateUI(String name, String startDate, String endDate, String description, String status, ObjectId id) {
         initComponents();
-        this.listName = nameList;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.description = description;
+        this.status = status;
+        this.id = id;
+        
+        jTextFieldUpdatedName.setText(name);
+        jTextAreaUpdatedDescription.setText(description);
+        if ("NOT STARTED".equals(status)) {
+            jRadioButton1.setSelected(true);
+        } else if ("COMPLETED".equals(status)) {
+            jRadioButton3.setSelected(true);
+        } else if ("IN PROGRESS".equals(status)) {
+            jRadioButton4.setSelected(true);
+        }
     }
 
     /**
@@ -43,17 +69,17 @@ public class TaskEditUI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextFieldName = new javax.swing.JTextField();
+        jTextFieldUpdatedName = new javax.swing.JTextField();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
         jLabelTituloListas = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jButtonUpdate = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextAreaDescription = new javax.swing.JTextArea();
-        jDateChooserDateStart = new com.toedter.calendar.JDateChooser();
-        jDateChooserDateEnd = new com.toedter.calendar.JDateChooser();
+        jTextAreaUpdatedDescription = new javax.swing.JTextArea();
+        jDateChooserUpdatedStartDate = new com.toedter.calendar.JDateChooser();
+        jDateChooserUpdatedEndDate = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,11 +117,11 @@ public class TaskEditUI extends javax.swing.JFrame {
         jLabelTituloListas.setForeground(new java.awt.Color(255, 255, 255));
         jLabelTituloListas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-        jButton1.setFont(new java.awt.Font("Courier New", 1, 24)); // NOI18N
-        jButton1.setText("SAVE");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonUpdate.setFont(new java.awt.Font("Courier New", 1, 24)); // NOI18N
+        jButtonUpdate.setText("UPDATE");
+        jButtonUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonUpdateActionPerformed(evt);
             }
         });
 
@@ -103,9 +129,9 @@ public class TaskEditUI extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("DESCRIPTION:");
 
-        jTextAreaDescription.setColumns(20);
-        jTextAreaDescription.setRows(5);
-        jScrollPane1.setViewportView(jTextAreaDescription);
+        jTextAreaUpdatedDescription.setColumns(20);
+        jTextAreaUpdatedDescription.setRows(5);
+        jScrollPane1.setViewportView(jTextAreaUpdatedDescription);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -126,14 +152,14 @@ public class TaskEditUI extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jTextFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jTextFieldUpdatedName, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addGroup(jPanel1Layout.createSequentialGroup()
                                                 .addGap(1, 1, 1)
-                                                .addComponent(jDateChooserDateStart, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addComponent(jDateChooserDateEnd, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(jDateChooserUpdatedStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(jDateChooserUpdatedEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGap(0, 0, Short.MAX_VALUE))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(17, 17, 17)
@@ -152,8 +178,8 @@ public class TaskEditUI extends javax.swing.JFrame {
                 .addComponent(jLabelTituloListas, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(230, 230, 230)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(212, 212, 212)
+                .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -163,16 +189,16 @@ public class TaskEditUI extends javax.swing.JFrame {
                 .addComponent(jLabelTituloListas, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldUpdatedName, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(39, 39, 39)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(jDateChooserDateStart, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jDateChooserUpdatedStartDate, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(32, 32, 32)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(jDateChooserDateEnd, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jDateChooserUpdatedEndDate, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -188,9 +214,9 @@ public class TaskEditUI extends javax.swing.JFrame {
                     .addComponent(jRadioButton4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButton3)
-                .addGap(33, 33, 33)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(76, Short.MAX_VALUE))
+                .addGap(35, 35, 35)
+                .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(69, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -207,43 +233,59 @@ public class TaskEditUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     String name = jTextFieldName.getText();
-    Date startDate = jDateChooserDateStart.getDate();
-    Date endDate = jDateChooserDateEnd.getDate();
-    String description = jTextAreaDescription.getText();
+    private void jButtonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpdateActionPerformed
+        
+        String updatedName = jTextFieldUpdatedName.getText();
+        Date updatedStartDate = jDateChooserUpdatedStartDate.getDate();
+        Date updatedEndDate = jDateChooserUpdatedEndDate.getDate();
+        String updatedDescription = jTextAreaUpdatedDescription.getText();
+        String updatedStatus = "";  // Obtén el nuevo estado de algún componente en tu interfaz
+        if (jRadioButton1.isSelected()) {
+            updatedStatus = "NOT STARTED";
+        } else if (jRadioButton3.isSelected()) {
+            updatedStatus = "COMPLETED";
+        } else if (jRadioButton4.isSelected()) {
+            updatedStatus = "IN PROGRESS";
+        }
 
-    String status = "";
-    if (jRadioButton1.isSelected()) {
-        status = "NOT STARTED";
-    } else if (jRadioButton3.isSelected()) {
-        status = "COMPLETED";
-    } else if (jRadioButton4.isSelected()) {
-        status = "IN PROGRESS";
-    }
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String startDateStr = sdf.format(startDate);
-    String endDateStr = sdf.format(endDate);
     MongoClient mongoClient = connect();
     MongoDatabase database = getDatabase();
     MongoCollection<Document> collection = database.getCollection("Task");
 
-    Document document = new Document("name", name)
-        .append("startDate", startDateStr)
-        .append("endDate", endDateStr)
-        .append("description", description)
-        .append("status", status)
-        .append("listName", listName);
+    Bson filter = Filters.eq("_id", id);
 
-    if (insertTaskIntoDatabase(document, collection)) {
-        JOptionPane.showMessageDialog(this, "Tarea insertada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+    Document updatedDocument = new Document()
+        .append("name", updatedName)
+        .append("description", updatedDescription)
+        .append("status", updatedStatus);
 
-        clearFields();
+    if (updatedStartDate != null) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String startDateString = dateFormat.format(updatedStartDate);
 
-        this.dispose();
+        updatedDocument.append("startDate", startDateString);
     }
-    }//GEN-LAST:event_jButton1ActionPerformed
-    private boolean insertTaskIntoDatabase(Document document, MongoCollection<Document> collection) {
+
+    if (updatedEndDate != null) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String endDateString = dateFormat.format(updatedEndDate);
+
+        updatedDocument.append("endDate", endDateString);
+    }
+
+    UpdateResult updateResult = collection.updateOne(filter, new Document("$set", updatedDocument));
+
+    if (updateResult.getModifiedCount() > 0) {
+        System.out.println("Tarea actualizada correctamente.");
+    } else {
+        System.out.println("No se pudo actualizar la tarea.");
+    }
+
+    mongoClient.close();
+
+    this.dispose();
+    }//GEN-LAST:event_jButtonUpdateActionPerformed
+    private boolean updateTaskIntoDatabase(Document document, MongoCollection<Document> collection) {
         try {
             collection.insertOne(document);
             return true;
@@ -254,10 +296,10 @@ public class TaskEditUI extends javax.swing.JFrame {
     }
 
     private void clearFields() {
-        jTextFieldName.setText("");
-        jDateChooserDateStart.setDate(null);
-        jDateChooserDateEnd.setDate(null);
-        jTextAreaDescription.setText("");
+        jTextFieldUpdatedName.setText("");
+        jDateChooserUpdatedStartDate.setDate(null);
+        jDateChooserUpdatedEndDate.setDate(null);
+        jTextAreaUpdatedDescription.setText("");
         buttonGroupStatus.clearSelection();
     }
 
@@ -278,30 +320,31 @@ public class TaskEditUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TaskEditUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskUpdateUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TaskEditUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskUpdateUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TaskEditUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskUpdateUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TaskEditUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TaskUpdateUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
     java.awt.EventQueue.invokeLater(new Runnable() {
         public void run() {
-            // Pasa el nombre de la lista (en este caso, una cadena vacía)
-            new TaskEditUI("").setVisible(true);
+            // Pasa los valores necesarios al constructor de TaskUpdateUI
+            new TaskUpdateUI("", "", "", "", "", new ObjectId()).setVisible(true);
         }
     });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupStatus;
-    private javax.swing.JButton jButton1;
-    private com.toedter.calendar.JDateChooser jDateChooserDateEnd;
-    private com.toedter.calendar.JDateChooser jDateChooserDateStart;
+    private javax.swing.JButton jButtonUpdate;
+    private com.toedter.calendar.JDateChooser jDateChooserUpdatedEndDate;
+    private com.toedter.calendar.JDateChooser jDateChooserUpdatedStartDate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -313,7 +356,7 @@ public class TaskEditUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextAreaDescription;
-    private javax.swing.JTextField jTextFieldName;
+    private javax.swing.JTextArea jTextAreaUpdatedDescription;
+    private javax.swing.JTextField jTextFieldUpdatedName;
     // End of variables declaration//GEN-END:variables
 }
