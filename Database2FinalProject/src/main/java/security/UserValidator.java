@@ -16,7 +16,7 @@ public class UserValidator {
     public boolean validateUser(String username, String password) {
         MongoCollection<Document> userCollection = database.getCollection("users");
 
-        Document query = new Document("username", username)
+        Document query = new Document("userName", username)
                 .append("password", password);
 
         try {
@@ -27,4 +27,16 @@ public class UserValidator {
             return false;
         }
     }
+    public Document getUserDocumentByUsername(String username) {
+    MongoCollection<Document> userCollection = database.getCollection("users");
+
+    Document query = new Document("userName", username);
+
+    try {
+        return userCollection.find(query).first();
+    } catch (Exception e) {
+        System.err.println("Error al obtener el documento del usuario por nombre de usuario: " + e.getMessage());
+        return null;
+    }
+}
 }

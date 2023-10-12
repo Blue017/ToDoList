@@ -6,8 +6,15 @@ package ui;
 
 import com.mongodb.client.MongoDatabase;
 import database.MongoDBConnection;
+import java.security.NoSuchAlgorithmException;
+import javax.servlet.http.HttpSession;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.apache.struts2.ServletActionContext;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import security.PasswordHasher;
+import security.SessionManager;
 import security.UserValidator;
 
 /**
@@ -185,29 +192,62 @@ public class LoginUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void SignUPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SignUPActionPerformed
-    // Crea una instancia del JFrame SignUP
-    SignUpUI signupFrame = new SignUpUI();
+        SignUpUI signupFrame = new SignUpUI();
+
+        signupFrame.setVisible(true);
     
-    // Hace visible el JFrame SignUP
-    signupFrame.setVisible(true);
+        signupFrame.setSize(800, 500);
+        
+        signupFrame.setLocationRelativeTo(null);
+        
+        signupFrame.setResizable(false);
     
-    // Cierra el JFrame actual (LoginUI) si lo deseas
-    this.dispose();
+        this.dispose();
     }//GEN-LAST:event_SignUPActionPerformed
 
     private void BtnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLoginActionPerformed
-         String username = TxtUser.getText();
-        String password = new String(TxtPasswd.getPassword());
+    String username = TxtUser.getText();
+    String password = new String(TxtPasswd.getPassword());
 
-    MongoDatabase database = MongoDBConnection.getDatabase();
+    try {
+        String hashedPassword = PasswordHasher.hashPassword(password);
 
-    UserValidator userValidator = new UserValidator(database);
+        MongoDatabase database = MongoDBConnection.getDatabase();
 
-    if (userValidator.validateUser(username, password)) {
-        JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
-    } else {
-        JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intenta de nuevo.");
-    }   
+        UserValidator userValidator = new UserValidator(database);
+
+        // Realiza una consulta para obtener el usuario por nombre de usuario
+        Document userDocument = userValidator.getUserDocumentByUsername(username);
+
+        if (userDocument != null && userValidator.validateUser(username, hashedPassword)) {
+            // Obtiene el ObjectId del usuario
+            ObjectId userId = userDocument.getObjectId("_id");
+
+            SessionManager.setLoggedInUsername(username);
+            SessionManager.setLoggedInUserId(userId);
+            JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
+              // Crear e invocar la ventana del menú principal
+            MainMenuUI mainMenu = new MainMenuUI();
+                   // Establecer el tamaño fijo
+            mainMenu.setSize(1090, 655); // Reemplaza 'ancho' y 'alto' con los valores deseados
+
+            // Centrar la ventana en la pantalla
+            mainMenu.setLocationRelativeTo(null);
+
+            // Deshabilitar la opción de maximizar
+            mainMenu.setResizable(false);
+
+            // Hacer visible el JFrame LoginUI
+            mainMenu.setVisible(true);
+            
+            mainMenu.setVisible(true);
+            this.dispose(); // Cierra la ventana de inicio de sesión actual si es necesario
+            } else {
+                JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intenta de nuevo.");
+            }   
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } 
     }//GEN-LAST:event_BtnLoginActionPerformed
 
     /**
