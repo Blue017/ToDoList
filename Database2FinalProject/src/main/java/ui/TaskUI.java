@@ -4,22 +4,85 @@
  */
 package ui;
 
+import com.mongodb.client.MongoClient;
+import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import static database.MongoDBConnection.connect;
+import static database.MongoDBConnection.getDatabase;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import model.Task;
+import model.TaskListTableModel;
+import model.TaskTableModel;
+import security.TaskDAO;
+
+
 /**
  *
  * @author GHOST
  */
 public class TaskUI extends javax.swing.JFrame {
+    private ObjectId listId;
+    private TaskListTableModel taskTableModel;
 
     /**
      * Creates new form Tareas
      */
     public TaskUI(String listName, String description) {
             initComponents();
+            
         jTextFieldNameList.setText(listName);
         jTextDescription.setText(description);
         jLabelNombreLista.setText("Task list, " + listName);
-        
+        listId = getListIdByName(listName);
+        taskTableModel = new TaskListTableModel(new Object[]{"Name", "Start Date", "End Date", "Description", "Status"}, 0);
+        jTableTasks.setModel(taskTableModel);
+
     }
+    public ObjectId getListIdByName(String listName) {
+        try (MongoClient mongoClient = connect()) {
+            MongoDatabase database = getDatabase();
+            MongoCollection<Document> taskListCollection = database.getCollection("taskLists");
+
+            Document query = new Document("listName", listName);
+
+            Document result = taskListCollection
+                    .find(query)
+                    .projection(Projections.include("_id"))
+                    .first();
+
+            if (result != null) {
+                return result.getObjectId("_id");
+            } else {
+                return null; // La lista no se encontró
+            }
+        }
+    }
+    private void cargarTareasDeLista(ObjectId listId) {
+        taskTableModel.setRowCount(0);
+
+        TaskDAO taskDAO = new TaskDAO(); // Crea una instancia de TaskDAO
+        List<Task> tasks = taskDAO.getTasksByListId(listId);
+
+        for (Task task : tasks) {
+            // Agrega cada tarea al modelo de la tabla de tareas
+            taskTableModel.addRow(new Object[]{
+                task.getName(),
+                task.getStartDate(),
+                task.getEndDate(),
+                task.getDescription(),
+                task.getStatus()
+            });
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -43,7 +106,7 @@ public class TaskUI extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTableTasks = new javax.swing.JTable();
-        jButton2 = new javax.swing.JButton();
+        jButtonNewTask = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -168,11 +231,11 @@ public class TaskUI extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTableTasks);
         jTableTasks.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        jButton2.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
-        jButton2.setText("NEW TASK");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonNewTask.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
+        jButtonNewTask.setText("NEW TASK");
+        jButtonNewTask.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButtonNewTaskActionPerformed(evt);
             }
         });
 
@@ -187,7 +250,7 @@ public class TaskUI extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonNewTask, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(436, 436, 436))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -207,7 +270,7 @@ public class TaskUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonNewTask, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
@@ -227,9 +290,20 @@ public class TaskUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void jButtonNewTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewTaskActionPerformed
+    TaskEditUI taskEditUI = new TaskEditUI();
+      // Configura el tamaño fijo
+    taskEditUI.setSize(600, 640); // Ajusta el tamaño según tus necesidades
+    
+    // Centra la ventana en la pantalla
+    taskEditUI.setLocationRelativeTo(null);
+    
+    // Deshabilita la capacidad de minimizar o maximizar
+    taskEditUI.setResizable(false);
+    
+    // Muestra la nueva ventana
+    taskEditUI.setVisible(true);
+    }//GEN-LAST:event_jButtonNewTaskActionPerformed
 
     private void jTableTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTasksMouseClicked
       // TODO add your handling code here:
@@ -276,8 +350,8 @@ public class TaskUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonCancel;
+    private javax.swing.JButton jButtonNewTask;
     private javax.swing.JButton jButtonUpdate;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -4,6 +4,14 @@
  */
 package ui;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import database.MongoDBConnection;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import org.bson.Document;
+
 /**
  *
  * @author GHOST
@@ -26,13 +34,13 @@ public class TaskEditUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroupStatys = new javax.swing.ButtonGroup();
+        buttonGroupStatus = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jTextFieldName = new javax.swing.JTextField();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
@@ -65,17 +73,17 @@ public class TaskEditUI extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("STATUS:");
 
-        buttonGroupStatys.add(jRadioButton1);
+        buttonGroupStatus.add(jRadioButton1);
         jRadioButton1.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
         jRadioButton1.setForeground(new java.awt.Color(255, 255, 255));
         jRadioButton1.setText("NOT STARTED");
 
-        buttonGroupStatys.add(jRadioButton3);
+        buttonGroupStatus.add(jRadioButton3);
         jRadioButton3.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
         jRadioButton3.setForeground(new java.awt.Color(255, 255, 255));
         jRadioButton3.setText("COMPLETED");
 
-        buttonGroupStatys.add(jRadioButton4);
+        buttonGroupStatus.add(jRadioButton4);
         jRadioButton4.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
         jRadioButton4.setForeground(new java.awt.Color(255, 255, 255));
         jRadioButton4.setText("IN PROGRESS");
@@ -86,6 +94,11 @@ public class TaskEditUI extends javax.swing.JFrame {
 
         jButton1.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
         jButton1.setText("SAVE");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
         jButton2.setText("UPDATE");
@@ -125,8 +138,8 @@ public class TaskEditUI extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addContainerGap(253, Short.MAX_VALUE))
+                                        .addComponent(jTextFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -156,7 +169,7 @@ public class TaskEditUI extends javax.swing.JFrame {
                 .addComponent(jLabelTituloListas, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(39, 39, 39)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -196,12 +209,61 @@ public class TaskEditUI extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String name = jTextFieldName.getText();
+        Date startDate = jDateChooserDateStart.getDate();
+        Date endDate = jDateChooserDateEnd.getDate();
+        String description = jTextAreaDescription.getText();
+        String status = getStatusFromRadioButtons();
+        
+        if (name.isEmpty() || startDate == null || endDate == null || description.isEmpty() || status.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            MongoClient mongoClient = MongoDBConnection.connect();
+            MongoDatabase database = MongoDBConnection.getDatabase();
+
+            MongoCollection<Document> collection = database.getCollection("Task"); 
+            Document newTask = new Document("name", name)
+                    .append("startDate", startDate)
+                    .append("endDate", endDate)
+                    .append("description", description)
+                    .append("status", status);
+            // Insertar el documento en la colección
+            collection.insertOne(newTask);
+            mongoClient.close();
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Tarea insertada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al insertar la tarea: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+    private String getStatusFromRadioButtons() {
+        if (jRadioButton1.isSelected()) {
+            return "NOT STARTED";
+        } else if (jRadioButton3.isSelected()) {
+            return "COMPLETED";
+        } else if (jRadioButton4.isSelected()) {
+            return "IN PROGRESS";
+        }
+        return ""; // Maneja un valor predeterminado o error si es necesario
+    }
+    
+    private void clearFields() {
+        jTextFieldName.setText("");
+        jDateChooserDateStart.setDate(null);
+        jDateChooserDateEnd.setDate(null);
+        jTextAreaDescription.setText("");
+        buttonGroupStatus.clearSelection();
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -238,7 +300,7 @@ public class TaskEditUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroupStatys;
+    private javax.swing.ButtonGroup buttonGroupStatus;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private com.toedter.calendar.JDateChooser jDateChooserDateEnd;
@@ -255,6 +317,6 @@ public class TaskEditUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextAreaDescription;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextFieldName;
     // End of variables declaration//GEN-END:variables
 }
