@@ -4,6 +4,7 @@
  */
 package ui;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import org.bson.types.ObjectId;
 import com.mongodb.client.MongoCollection;
@@ -21,6 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import model.Task;
 import model.TaskListTableModel;
 import model.TaskTableModel;
+import org.bson.conversions.Bson;
 import security.TaskDAO;
 
 
@@ -29,60 +31,53 @@ import security.TaskDAO;
  * @author GHOST
  */
 public class TaskUI extends javax.swing.JFrame {
-    private ObjectId listId;
-    private TaskListTableModel taskTableModel;
+    private String nameList;
+
 
     /**
      * Creates new form Tareas
      */
     public TaskUI(String listName, String description) {
+            this.nameList = listName;
             initComponents();
-            
-        jTextFieldNameList.setText(listName);
-        jTextDescription.setText(description);
-        jLabelNombreLista.setText("Task list, " + listName);
-        listId = getListIdByName(listName);
-        taskTableModel = new TaskListTableModel(new Object[]{"Name", "Start Date", "End Date", "Description", "Status"}, 0);
-        jTableTasks.setModel(taskTableModel);
-
+            loadTasks(listName);
     }
-    public ObjectId getListIdByName(String listName) {
-        try (MongoClient mongoClient = connect()) {
-            MongoDatabase database = getDatabase();
-            MongoCollection<Document> taskListCollection = database.getCollection("taskLists");
+    private void loadTasks(String listName) {
+        // Conecta a la base de datos y obtén la colección "Task"
+        MongoClient mongoClient = connect();
+        MongoDatabase database = getDatabase();
+        MongoCollection<Document> collection = database.getCollection("Task");
 
-            Document query = new Document("listName", listName);
+        // Define las columnas que deseas mostrar en la tabla
+        String[] columnNames = {"NAME", "START DATE", "END DATE", "DESCRIPTION", "STATUS"};
 
-            Document result = taskListCollection
-                    .find(query)
-                    .projection(Projections.include("_id"))
-                    .first();
+        // Crea un modelo de tabla personalizado
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-            if (result != null) {
-                return result.getObjectId("_id");
-            } else {
-                return null; // La lista no se encontró
-            }
+        // Crea un filtro para buscar tasks asociados a listName
+        Bson filter = Filters.eq("listName", listName);
+
+        // Consulta los documentos que cumplan con el filtro
+        FindIterable<Document> documents = collection.find(filter);
+
+        for (Document document : documents) {
+            // Obtén los valores de las columnas de cada documento
+            String name = document.getString("name");
+            String startDate = document.getString("startDate");
+            String endDate = document.getString("endDate");
+            String description = document.getString("description");
+            String status = document.getString("status");
+
+            // Agrega una fila con los valores a la tabla
+            model.addRow(new Object[]{name, startDate, endDate, description, status});
         }
-    }
-    private void cargarTareasDeLista(ObjectId listId) {
-        taskTableModel.setRowCount(0);
 
-        TaskDAO taskDAO = new TaskDAO(); // Crea una instancia de TaskDAO
-        List<Task> tasks = taskDAO.getTasksByListId(listId);
+        // Asigna el modelo de tabla a la tabla jTableTasks
+        jTableTasks.setModel(model);
 
-        for (Task task : tasks) {
-            // Agrega cada tarea al modelo de la tabla de tareas
-            taskTableModel.addRow(new Object[]{
-                task.getName(),
-                task.getStartDate(),
-                task.getEndDate(),
-                task.getDescription(),
-                task.getStatus()
-            });
-        }
-    }
-
+        // Cierra la conexión a MongoDB
+        mongoClient.close();
+  }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -94,112 +89,14 @@ public class TaskUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jTextFieldNameList = new javax.swing.JTextField();
-        jButtonUpdate = new javax.swing.JButton();
-        jLabelNombreLista = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTextDescription = new javax.swing.JTextArea();
-        jButtonCancel = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTableTasks = new javax.swing.JTable();
-        jButtonNewTask = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jLabelNombreLista = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jPanel2.setBackground(new java.awt.Color(102, 0, 0));
-        jPanel2.setForeground(new java.awt.Color(255, 255, 255));
-
-        jLabel2.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("EDIT NAME:");
-
-        jLabel3.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("EDIT DESCRIPTION:");
-
-        jTextFieldNameList.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-
-        jButtonUpdate.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
-        jButtonUpdate.setText("UPDATE");
-        jButtonUpdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonUpdateActionPerformed(evt);
-            }
-        });
-
-        jLabelNombreLista.setFont(new java.awt.Font("Courier New", 3, 36)); // NOI18N
-        jLabelNombreLista.setForeground(new java.awt.Color(255, 255, 255));
-        jLabelNombreLista.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-        jTextDescription.setColumns(20);
-        jTextDescription.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-        jTextDescription.setRows(5);
-        jScrollPane3.setViewportView(jTextDescription);
-
-        jButtonCancel.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
-        jButtonCancel.setText("CANCEL");
-        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonCancelActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(242, 242, 242)
-                .addComponent(jLabelNombreLista, javax.swing.GroupLayout.PREFERRED_SIZE, 549, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(104, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(165, 165, 165)
-                        .addComponent(jTextFieldNameList, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(87, 87, 87)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jButtonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(95, 95, 95))
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 509, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(147, 147, 147))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jLabelNombreLista, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldNameList, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(90, 90, 90)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(71, 71, 71)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(77, 77, 77))
-        );
-
-        jTabbedPane1.addTab("EDIT LIST", jPanel2);
 
         jPanel1.setBackground(new java.awt.Color(102, 0, 0));
 
@@ -231,47 +128,53 @@ public class TaskUI extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTableTasks);
         jTableTasks.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        jButtonNewTask.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
-        jButtonNewTask.setText("NEW TASK");
-        jButtonNewTask.addActionListener(new java.awt.event.ActionListener() {
+        jButton2.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
+        jButton2.setText("NEW TASK");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonNewTaskActionPerformed(evt);
+                jButton2ActionPerformed(evt);
             }
         });
 
-        jLabel4.setFont(new java.awt.Font("Courier New", 3, 48)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("TASKS");
+        jLabelNombreLista.setFont(new java.awt.Font("Courier New", 3, 36)); // NOI18N
+        jLabelNombreLista.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelNombreLista.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelNombreLista.setText("TASK");
+
+        jButton1.setFont(new java.awt.Font("Courier New", 3, 24)); // NOI18N
+        jButton1.setText("EDIT");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButtonNewTask, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(436, 436, 436))
+                .addContainerGap(48, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 949, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 949, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(336, 336, 336)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addGap(183, 183, 183)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(227, 227, 227))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(305, 305, 305)
+                .addComponent(jLabelNombreLista, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
+                .addComponent(jLabelNombreLista, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButtonNewTask, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("EDIT TASKS", jPanel1);
@@ -290,32 +193,20 @@ public class TaskUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonNewTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewTaskActionPerformed
-    TaskEditUI taskEditUI = new TaskEditUI();
-      // Configura el tamaño fijo
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    TaskEditUI taskEditUI = new TaskEditUI(nameList);
     taskEditUI.setSize(600, 640); // Ajusta el tamaño según tus necesidades
     
-    // Centra la ventana en la pantalla
     taskEditUI.setLocationRelativeTo(null);
     
-    // Deshabilita la capacidad de minimizar o maximizar
     taskEditUI.setResizable(false);
     
-    // Muestra la nueva ventana
     taskEditUI.setVisible(true);
-    }//GEN-LAST:event_jButtonNewTaskActionPerformed
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTableTasksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTasksMouseClicked
-      // TODO add your handling code here:
+
     }//GEN-LAST:event_jTableTasksMouseClicked
-
-    private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButtonCancelActionPerformed
-
-    private void jButtonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpdateActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButtonUpdateActionPerformed
 
     /**
      * @param args the command line arguments
@@ -350,20 +241,12 @@ public class TaskUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonCancel;
-    private javax.swing.JButton jButtonNewTask;
-    private javax.swing.JButton jButtonUpdate;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabelNombreLista;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTableTasks;
-    private javax.swing.JTextArea jTextDescription;
-    private javax.swing.JTextField jTextFieldNameList;
     // End of variables declaration//GEN-END:variables
 }

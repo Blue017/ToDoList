@@ -7,9 +7,10 @@ package ui;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import database.MongoDBConnection;
+import static database.MongoDBConnection.connect;
+import static database.MongoDBConnection.getDatabase;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.JOptionPane;
 import org.bson.Document;
 
 /**
@@ -17,12 +18,13 @@ import org.bson.Document;
  * @author GHOST
  */
 public class TaskEditUI extends javax.swing.JFrame {
-
+    private String listName;
     /**
      * Creates new form TaskEditUI
      */
-    public TaskEditUI() {
+    public TaskEditUI(String nameList) {
         initComponents();
+        this.listName = nameList;
     }
 
     /**
@@ -216,54 +218,39 @@ public class TaskEditUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String name = jTextFieldName.getText();
-        Date startDate = jDateChooserDateStart.getDate();
-        Date endDate = jDateChooserDateEnd.getDate();
-        String description = jTextAreaDescription.getText();
-        String status = getStatusFromRadioButtons();
-        
-        if (name.isEmpty() || startDate == null || endDate == null || description.isEmpty() || status.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        try {
-            MongoClient mongoClient = MongoDBConnection.connect();
-            MongoDatabase database = MongoDBConnection.getDatabase();
+    String name = jTextFieldName.getText();
+    Date startDate = jDateChooserDateStart.getDate();
+    Date endDate = jDateChooserDateEnd.getDate();
+    String description = jTextAreaDescription.getText();
 
-            MongoCollection<Document> collection = database.getCollection("Task"); 
-            Document newTask = new Document("name", name)
-                    .append("startDate", startDate)
-                    .append("endDate", endDate)
-                    .append("description", description)
-                    .append("status", status);
-            // Insertar el documento en la colección
-            collection.insertOne(newTask);
-            mongoClient.close();
-            clearFields();
-            JOptionPane.showMessageDialog(this, "Tarea insertada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al insertar la tarea: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+    String status = "";
+    if (jRadioButton1.isSelected()) {
+        status = "NOT STARTED";
+    } else if (jRadioButton3.isSelected()) {
+        status = "COMPLETED";
+    } else if (jRadioButton4.isSelected()) {
+        status = "IN PROGRESS";
+    }
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    String startDateStr = sdf.format(startDate);
+    String endDateStr = sdf.format(endDate);
+    MongoClient mongoClient = connect();
+    MongoDatabase database = getDatabase();
+    MongoCollection<Document> collection = database.getCollection("Task");
+
+    // Asocia la tarea con el nombre de la lista
+    Document document = new Document("name", name)
+        .append("startDate", startDateStr)
+        .append("endDate", endDateStr)
+        .append("description", description)
+        .append("status", status)
+        .append("listName", listName);
+
+    collection.insertOne(document);
+
+    mongoClient.close();
     }//GEN-LAST:event_jButton1ActionPerformed
-    private String getStatusFromRadioButtons() {
-        if (jRadioButton1.isSelected()) {
-            return "NOT STARTED";
-        } else if (jRadioButton3.isSelected()) {
-            return "COMPLETED";
-        } else if (jRadioButton4.isSelected()) {
-            return "IN PROGRESS";
-        }
-        return ""; // Maneja un valor predeterminado o error si es necesario
-    }
-    
-    private void clearFields() {
-        jTextFieldName.setText("");
-        jDateChooserDateStart.setDate(null);
-        jDateChooserDateEnd.setDate(null);
-        jTextAreaDescription.setText("");
-        buttonGroupStatus.clearSelection();
-    }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -292,11 +279,12 @@ public class TaskEditUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TaskEditUI().setVisible(true);
-            }
-        });
+    java.awt.EventQueue.invokeLater(new Runnable() {
+        public void run() {
+            // Pasa el nombre de la lista (en este caso, una cadena vacía)
+            new TaskEditUI("").setVisible(true);
+        }
+    });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
