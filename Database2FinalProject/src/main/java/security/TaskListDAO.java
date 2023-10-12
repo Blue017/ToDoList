@@ -37,10 +37,10 @@ public class TaskListDAO {
         taskListCollection.insertOne(taskListDocument);
     }
 
-    public List<TaskList> getListasDeTareasPorUsuario(String username) {
+    public List<TaskList> getListasDeTareasPorUsuario(ObjectId userId) {
         List<TaskList> listasDeTareas = new ArrayList<>();
 
-        Document query = new Document("userName", username);
+        Document query = new Document("userId", userId); // Cambia "userName" por "userId"
         FindIterable<Document> results = taskListCollection.find(query);
 
         try (MongoCursor<Document> cursor = results.iterator()) {
@@ -48,7 +48,7 @@ public class TaskListDAO {
                 Document document = cursor.next();
                 String listName = document.getString("listName");
                 String description = document.getString("description");
-                
+
                 TaskList listaDeTareas = new TaskList(listName, description);
                 listasDeTareas.add(listaDeTareas);
             }
@@ -56,10 +56,25 @@ public class TaskListDAO {
 
         return listasDeTareas;
     }
+
     
     public boolean checkIfListExists(String listName, ObjectId userId) {
         Document query = new Document("userId", userId).append("listName", listName);
         return taskListCollection.countDocuments(query) > 0;
+    }
+    public ObjectId getListIdByListNameAndDescription(String listName, String description, ObjectId userId) {
+        Document query = new Document("userId", userId)
+            .append("listName", listName)
+            .append("description", description);
+
+        FindIterable<Document> results = taskListCollection.find(query);
+        try (MongoCursor<Document> cursor = results.iterator()) {
+            if (cursor.hasNext()) {
+                Document document = cursor.next();
+                return document.getObjectId("_id");
+            }
+        }
+        return null;
     }
 
 

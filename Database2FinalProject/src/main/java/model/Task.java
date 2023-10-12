@@ -8,28 +8,62 @@ package model;
  *
  * @author GHOST
  */
+import java.util.Date;
+
 public class Task {
-    private String taskName;
-    private boolean completed;
+    private String name;
+    private Date startDate;
+    private Date endDate;
+    private String description;
+    private String status;
 
-    public Task(String taskName) {
-        this.taskName = taskName;
-        this.completed = false;
+    public Task(String name, Date startDate, Date endDate, String description, String status) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.description = description;
+        this.status = status;
     }
 
-    public String getTaskName() {
-        return taskName;
+    // Métodos getter y setter para acceder a las propiedades de la tarea.
+
+    public String getName() {
+        return name;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public boolean isCompleted() {
-        return completed;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

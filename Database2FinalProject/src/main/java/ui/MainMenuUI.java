@@ -46,21 +46,22 @@ public class MainMenuUI extends javax.swing.JFrame {
         cargarListasDeTareasDelUsuario();
     }
     
-private void cargarListasDeTareasDelUsuario() {
-    String loggedInUsername = SessionManager.getLoggedInUsername();
+    private void cargarListasDeTareasDelUsuario() {
+        ObjectId loggedInUserId = SessionManager.getLoggedInUserId(); // Obtén el ID de usuario desde la sesión
 
-    if (loggedInUsername != null) {
-        TaskListDAO taskListDAO = new TaskListDAO();
-        
-        List<TaskList> listasDeTareas = taskListDAO.getListasDeTareasPorUsuario(loggedInUsername);
+        if (loggedInUserId != null) {
+            TaskListDAO taskListDAO = new TaskListDAO();
 
-        tableModel.setRowCount(0);
+            List<TaskList> listasDeTareas = taskListDAO.getListasDeTareasPorUsuario(loggedInUserId);
 
-        for (TaskList listaDeTareas : listasDeTareas) {
-            tableModel.addRow(new Object[]{listaDeTareas.getName(), listaDeTareas.getDescription()});
+            tableModel.setRowCount(0);
+
+            for (TaskList listaDeTareas : listasDeTareas) {
+                tableModel.addRow(new Object[]{listaDeTareas.getName(), listaDeTareas.getDescription()});
+            }
         }
     }
-}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -270,18 +271,18 @@ private void cargarListasDeTareasDelUsuario() {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTableTaskListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableTaskListMouseClicked
-          if (evt.getClickCount() == 1) {
-            int selectedRow = jTableTaskList.getSelectedRow();
-            if (selectedRow != -1) {
-                String listName = (String) jTableTaskList.getValueAt(selectedRow, 0);
-                String description = (String) jTableTaskList.getValueAt(selectedRow, 1);
-                TaskUI taskUI = new TaskUI(listName, description);
-                taskUI.setVisible(true);
-                taskUI.setSize(1037, 663);
-                taskUI.setLocationRelativeTo(null);
-                taskUI.setLocationRelativeTo(this);
-            }
+    if (evt.getClickCount() == 1) {
+        int selectedRow = jTableTaskList.getSelectedRow();
+        if (selectedRow != -1) {
+            String listName = (String) jTableTaskList.getValueAt(selectedRow, 0);
+            String description = (String) jTableTaskList.getValueAt(selectedRow, 1);
+            TaskUI taskUI = new TaskUI(listName, description);
+            taskUI.setVisible(true);
+            taskUI.setSize(1037, 663);
+            taskUI.setLocationRelativeTo(null);
+            taskUI.setLocationRelativeTo(this);
         }
+    }
     }//GEN-LAST:event_jTableTaskListMouseClicked
 
     /**

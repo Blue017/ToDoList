@@ -150,7 +150,15 @@ public class TaskUI extends javax.swing.JFrame {
             new String [] {
                 "NAME", "START DATE", "END DATE", "DESCRIPTION", "STATUS"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jTableTasks.setColumnSelectionAllowed(true);
         jTableTasks.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
