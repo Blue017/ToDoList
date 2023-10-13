@@ -80,6 +80,8 @@ public class TaskUpdateUI extends javax.swing.JFrame {
         jTextAreaUpdatedDescription = new javax.swing.JTextArea();
         jDateChooserUpdatedStartDate = new com.toedter.calendar.JDateChooser();
         jDateChooserUpdatedEndDate = new com.toedter.calendar.JDateChooser();
+        jButtonDelete = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -117,7 +119,7 @@ public class TaskUpdateUI extends javax.swing.JFrame {
         jLabelTituloListas.setForeground(new java.awt.Color(255, 255, 255));
         jLabelTituloListas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-        jButtonUpdate.setFont(new java.awt.Font("Courier New", 1, 24)); // NOI18N
+        jButtonUpdate.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
         jButtonUpdate.setText("UPDATE");
         jButtonUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,6 +134,22 @@ public class TaskUpdateUI extends javax.swing.JFrame {
         jTextAreaUpdatedDescription.setColumns(20);
         jTextAreaUpdatedDescription.setRows(5);
         jScrollPane1.setViewportView(jTextAreaUpdatedDescription);
+
+        jButtonDelete.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
+        jButtonDelete.setText("DELETE");
+        jButtonDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDeleteActionPerformed(evt);
+            }
+        });
+
+        jButton1.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
+        jButton1.setText("CANCEL");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -177,10 +195,14 @@ public class TaskUpdateUI extends javax.swing.JFrame {
                 .addGap(0, 39, Short.MAX_VALUE)
                 .addComponent(jLabelTituloListas, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(42, 42, 42))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(212, 212, 212)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(41, 41, 41)
                 .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(61, 61, 61)
+                .addComponent(jButtonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(61, 61, 61))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -214,9 +236,12 @@ public class TaskUpdateUI extends javax.swing.JFrame {
                     .addComponent(jRadioButton4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jRadioButton3)
-                .addGap(35, 35, 35)
-                .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addGap(44, 44, 44)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(58, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -285,6 +310,39 @@ public class TaskUpdateUI extends javax.swing.JFrame {
 
     this.dispose();
     }//GEN-LAST:event_jButtonUpdateActionPerformed
+
+    private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
+        int option = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar esta tarea?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+
+        if (option == JOptionPane.YES_OPTION) {
+            String taskNameToDelete = JOptionPane.showInputDialog(this, "Por favor, ingrese el nombre de la tarea para confirmar la eliminación:");
+
+            if (taskNameToDelete != null) {
+                if (taskNameToDelete.equals(name)) {
+                    MongoClient mongoClient = connect();
+                    MongoDatabase database = getDatabase();
+                    MongoCollection<Document> collection = database.getCollection("Task");
+
+                    Bson filter = Filters.eq("_id", id);
+
+                    collection.deleteOne(filter);
+
+                    mongoClient.close();
+
+                    JOptionPane.showMessageDialog(this, "Tarea eliminada correctamente.");
+
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "El nombre ingresado no coincide con el nombre de la tarea. La tarea no se eliminó.");
+                }
+            }
+        } else {
+        }
+    }//GEN-LAST:event_jButtonDeleteActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
     private boolean updateTaskIntoDatabase(Document document, MongoCollection<Document> collection) {
         try {
             collection.insertOne(document);
@@ -342,6 +400,8 @@ public class TaskUpdateUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroupStatus;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonDelete;
     private javax.swing.JButton jButtonUpdate;
     private com.toedter.calendar.JDateChooser jDateChooserUpdatedEndDate;
     private com.toedter.calendar.JDateChooser jDateChooserUpdatedStartDate;

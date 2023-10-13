@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import model.Task;
@@ -116,6 +117,7 @@ public class TaskUI extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jLabelNombreLista = new javax.swing.JLabel();
         jButtonBack = new javax.swing.JButton();
+        jButtonDeleteList = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -162,11 +164,19 @@ public class TaskUI extends javax.swing.JFrame {
         jLabelNombreLista.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelNombreLista.setText("TASK");
 
-        jButtonBack.setFont(new java.awt.Font("Courier New", 3, 24)); // NOI18N
+        jButtonBack.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
         jButtonBack.setText("Back");
         jButtonBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonBackActionPerformed(evt);
+            }
+        });
+
+        jButtonDeleteList.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
+        jButtonDeleteList.setText("DELETE LIST");
+        jButtonDeleteList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDeleteListActionPerformed(evt);
             }
         });
 
@@ -179,15 +189,17 @@ public class TaskUI extends javax.swing.JFrame {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 949, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(183, 183, 183)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButtonBack, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(227, 227, 227))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(305, 305, 305)
                 .addComponent(jLabelNombreLista, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(183, 183, 183)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(113, 113, 113)
+                .addComponent(jButtonBack, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonDeleteList, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(98, 98, 98))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,10 +209,11 @@ public class TaskUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonBack, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                    .addComponent(jButtonBack, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonDeleteList, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE))
+                .addGap(17, 17, 17))
         );
 
         jTabbedPane1.addTab("EDIT TASKS", jPanel1);
@@ -263,6 +276,35 @@ public class TaskUI extends javax.swing.JFrame {
     this.dispose();
     }//GEN-LAST:event_jButtonBackActionPerformed
 
+    private void jButtonDeleteListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteListActionPerformed
+        int dialogResult = JOptionPane.showConfirmDialog(this, "¿Seguro que quieres eliminar la lista? Ten en cuenta que borrar la lista eliminará todas las tareas asociadas a ella.", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+    
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            deleteListAndTasks();
+        }
+    }//GEN-LAST:event_jButtonDeleteListActionPerformed
+
+    
+    private void deleteListAndTasks() {
+        MongoClient mongoClient = connect();
+        MongoDatabase database = getDatabase();
+        MongoCollection<Document> taskCollection = database.getCollection("Task");
+        MongoCollection<Document> listCollection = database.getCollection("TaskList");
+
+        Bson filter = Filters.eq("listName", nameList);
+        taskCollection.deleteMany(filter);
+
+        Bson listFilter = Filters.eq("listName", nameList);
+        listCollection.deleteOne(listFilter);
+
+        mongoClient.close();
+
+        this.dispose();
+    }
+
+
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -298,6 +340,7 @@ public class TaskUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonBack;
+    private javax.swing.JButton jButtonDeleteList;
     private javax.swing.JLabel jLabelNombreLista;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
