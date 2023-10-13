@@ -8,6 +8,8 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.MongoDBConnection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
@@ -22,6 +24,7 @@ import org.bson.Document;
 import security.SessionManager;
 import security.TaskListDAO;
 import javax.swing.JLabel;
+import javax.swing.Timer;
 import org.bson.types.ObjectId;
 
 /**
@@ -29,6 +32,8 @@ import org.bson.types.ObjectId;
  * @author GHOST
  */
 public class MainMenuUI extends javax.swing.JFrame {
+    private Timer tableUpdateTimer;
+
     private TaskListTableModel tableModel;
     private List<TaskList> taskLists = new ArrayList<>();
     private TaskListManager taskListManager;
@@ -37,7 +42,7 @@ public class MainMenuUI extends javax.swing.JFrame {
 
     public MainMenuUI() {
         initComponents();
-
+        initializeTableUpdateTimer();
         tableModel = new TaskListTableModel(new Object[]{"List Name", "Description"}, 0);
         jLabelWelcome.setText(welcomeMessage);
         jTableTaskList.setModel(tableModel);
@@ -61,7 +66,18 @@ public class MainMenuUI extends javax.swing.JFrame {
             }
         }
     }
-
+    private void initializeTableUpdateTimer() {
+        int updateInterval = 50000;
+        ActionListener tableUpdateAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarListasDeTareasDelUsuario();
+            }
+        };
+        tableUpdateTimer = new Timer(updateInterval, tableUpdateAction);
+        tableUpdateTimer.setRepeats(true);
+        tableUpdateTimer.start();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -79,6 +95,7 @@ public class MainMenuUI extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTableTaskList = new javax.swing.JTable();
+        jButtonRefresh = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         JListTask = new javax.swing.JList<>();
         jLabelWelcome = new javax.swing.JLabel();
@@ -105,7 +122,7 @@ public class MainMenuUI extends javax.swing.JFrame {
 
         PanelListas.setBackground(new java.awt.Color(255, 255, 255));
 
-        jButton2.setFont(new java.awt.Font("Courier New", 1, 18)); // NOI18N
+        jButton2.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
         jButton2.setText("NEW LIST");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,6 +149,14 @@ public class MainMenuUI extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTableTaskList);
 
+        jButtonRefresh.setFont(new java.awt.Font("Courier New", 3, 18)); // NOI18N
+        jButtonRefresh.setText("REFRESH");
+        jButtonRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRefreshActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout PanelListasLayout = new javax.swing.GroupLayout(PanelListas);
         PanelListas.setLayout(PanelListasLayout);
         PanelListasLayout.setHorizontalGroup(
@@ -142,8 +167,10 @@ public class MainMenuUI extends javax.swing.JFrame {
                         .addGap(17, 17, 17)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 961, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(PanelListasLayout.createSequentialGroup()
-                        .addGap(404, 404, 404)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(250, 250, 250)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(124, 124, 124)
+                        .addComponent(jButtonRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         PanelListasLayout.setVerticalGroup(
@@ -152,7 +179,9 @@ public class MainMenuUI extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 421, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(PanelListasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                    .addComponent(jButtonRefresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
@@ -285,6 +314,10 @@ public class MainMenuUI extends javax.swing.JFrame {
     }
     }//GEN-LAST:event_jTableTaskListMouseClicked
 
+    private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
+        cargarListasDeTareasDelUsuario();
+    }//GEN-LAST:event_jButtonRefreshActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -326,6 +359,7 @@ public class MainMenuUI extends javax.swing.JFrame {
     private javax.swing.JPanel PanelListas;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButtonRefresh;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabelWelcome;
     private javax.swing.JPanel jPanel1;

@@ -6,10 +6,16 @@ package ui;
 
 import com.mongodb.client.MongoDatabase;
 import database.MongoDBConnection;
+import java.awt.Dialog;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import javax.servlet.http.HttpSession;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.apache.struts2.ServletActionContext;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -22,12 +28,12 @@ import security.UserValidator;
  * @author GHOST
  */
 public class LoginUI extends javax.swing.JFrame {
-
     /**
      * Creates new form LoginUI
      */
     public LoginUI() {
         initComponents();
+        
     }
 
     /**
@@ -206,48 +212,56 @@ public class LoginUI extends javax.swing.JFrame {
     }//GEN-LAST:event_SignUPActionPerformed
 
     private void BtnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLoginActionPerformed
-    String username = TxtUser.getText();
-    String password = new String(TxtPasswd.getPassword());
+    // Deshabilitar los componentes de entrada (usuario y contraseña)
+    TxtUser.setEnabled(false);
+    TxtPasswd.setEnabled(false);
 
-    try {
-        String hashedPassword = PasswordHasher.hashPassword(password);
+    // Crear un nuevo JFrame Loading
+    LoadingUI loadingFrame = new LoadingUI();
 
-        MongoDatabase database = MongoDBConnection.getDatabase();
 
-        UserValidator userValidator = new UserValidator(database);
+    // Centrar el JFrame de Loading
+    loadingFrame.setLocationRelativeTo(null);
 
-        // Realiza una consulta para obtener el usuario por nombre de usuario
-        Document userDocument = userValidator.getUserDocumentByUsername(username);
+    // Mostrar la ventana de carga
+    loadingFrame.setVisible(true);
 
-        if (userDocument != null && userValidator.validateUser(username, hashedPassword)) {
-            // Obtiene el ObjectId del usuario
-            ObjectId userId = userDocument.getObjectId("_id");
+    // Crear un hilo adicional para el proceso de inicio de sesión
+    Thread loginThread = new Thread(() -> {
+        try {
+            String username = TxtUser.getText();
+            String password = new String(TxtPasswd.getPassword());
 
-            SessionManager.setLoggedInUsername(username);
-            SessionManager.setLoggedInUserId(userId);
-            JOptionPane.showMessageDialog(this, "Inicio de sesión exitoso.");
-              // Crear e invocar la ventana del menú principal
-            MainMenuUI mainMenu = new MainMenuUI();
-                   // Establecer el tamaño fijo
-            mainMenu.setSize(1090, 655); // Reemplaza 'ancho' y 'alto' con los valores deseados
+            String hashedPassword = PasswordHasher.hashPassword(password);
+            MongoDatabase database = MongoDBConnection.getDatabase();
+            UserValidator userValidator = new UserValidator(database);
+            Document userDocument = userValidator.getUserDocumentByUsername(username);
 
-            // Centrar la ventana en la pantalla
-            mainMenu.setLocationRelativeTo(null);
-
-            // Deshabilitar la opción de maximizar
-            mainMenu.setResizable(false);
-
-            // Hacer visible el JFrame LoginUI
-            mainMenu.setVisible(true);
-            
-            mainMenu.setVisible(true);
-            this.dispose(); // Cierra la ventana de inicio de sesión actual si es necesario
+            if (userDocument != null && userValidator.validateUser(username, hashedPassword)) {
+                ObjectId userId = userDocument.getObjectId("_id");
+                SessionManager.setLoggedInUsername(username);
+                SessionManager.setLoggedInUserId(userId);
+                MainMenuUI mainMenu = new MainMenuUI();
+                mainMenu.setSize(1090, 655);
+                mainMenu.setLocationRelativeTo(null);
+                mainMenu.setResizable(false);
+                mainMenu.setVisible(true);
+                mainMenu.setVisible(true);
+                this.dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intenta de nuevo.");
-            }   
+            }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        } 
+        } finally {
+            TxtUser.setEnabled(true);
+            TxtPasswd.setEnabled(true);
+            // Cerrar el JFrame de Loading
+            loadingFrame.dispose();
+        }
+    });
+
+    loginThread.start();
     }//GEN-LAST:event_BtnLoginActionPerformed
 
     /**
