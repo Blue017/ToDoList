@@ -27,7 +27,7 @@ Para ejecutar esta aplicación en tu máquina, debes tener instalados los siguie
 1. Clona este repositorio en tu máquina local:
 
    ```bash
-   
+   https://github.com/Blue017/ToDoList.git
 Ve al directorio del proyecto:
 
 
