@@ -35,18 +35,20 @@ cd ToDoList
 
 Compila el proyecto utilizando Maven:
 
-mvn clean install
+   ```bash
+   mvn clean install
+  ```
 
 Ejecuta la aplicación:
 
+   ```bash
+   java -jar target/Mongo-1.0-SNAPSHOT.jar
+  ```
 
-java -jar target/Mongo-1.0-SNAPSHOT.jar
-
-Abre tu navegador web y accede a la aplicación en http://localhost:8080.
 
 Configuración
 
-Puedes configurar la conexión a la base de datos MongoDB editando el archivo application.properties en el directorio src/main/resources.
+Puedes configurar la conexión a la base de datos MongoDB editando el archivo application.properties en el directorio src/main/resources/database/
 
 properties
 
@@ -55,7 +57,6 @@ spring.data.mongodb.port=27017
 spring.data.mongodb.database=todolist
 
 Asegúrate de que la base de datos configurada coincida con tu instancia de MongoDB.
-
 
 
 Este proyecto ha sido desarrollado por
