@@ -61,6 +61,42 @@ Asegúrate de que la base de datos configurada coincida con tu instancia de Mong
 ## DIAGRAMA BASE DE DATOS MONGO
 ![image](https://github.com/Blue017/ToDoList/assets/115097453/e3f2cfc6-7450-42d2-b065-f35f6e0061ba)
 
+## Diagrama de la aplicacion
+
+# parte 1
+![image](https://github.com/Blue017/ToDoList/assets/115097453/bd99b035-6778-47c2-9869-27b6e174b03b)
+# parte 2
+![image](https://github.com/Blue017/ToDoList/assets/115097453/f4ed4448-1386-433f-9099-0ea6c58871a0)
+
+# en codigo mermaid
+
+   ```bash
+graph TD
+    A[Inicio] --> B(Inicio de Sesión)
+    B -->|Credenciales Correctas| C{Menú Principal}
+    C -->|Crear Lista| D(Crear Nueva Lista)
+    D --> E{Nueva Lista Creada}
+    E -->|Sí| F{Crear Nueva Tarea}
+    F -->|No| C
+    F -->|Sí| G(Crear Nueva Tarea)
+    G --> H{Nueva Tarea Creada}
+    H -->|Sí| I{Actualizar Tarea}
+    I -->|Sí| J(Actualizar Tarea)
+    I -->|No| C
+    J --> K{Tarea Actualizada}
+    K -->|Sí| L{Eliminar Tarea}
+    L -->|Sí| M(Eliminar Tarea)
+    L -->|No| C
+    M --> N{Tarea Eliminada}
+    N -->|Sí| C
+    N -->|No| L
+    C -->|Eliminar Lista| O(Eliminar Lista)
+    O --> P{Lista Eliminada}
+    P -->|Sí| C
+    P -->|No| O
+  ```
+
+
 
 
 Este proyecto ha sido desarrollado por
