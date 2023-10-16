@@ -58,6 +58,10 @@ spring.data.mongodb.database=todolist
 
 Asegúrate de que la base de datos configurada coincida con tu instancia de MongoDB.
 
+## DIAGRAMA BASE DE DATOS MONGO
+![image](https://github.com/Blue017/ToDoList/assets/115097453/e3f2cfc6-7450-42d2-b065-f35f6e0061ba)
+
+
 
 Este proyecto ha sido desarrollado por
 
