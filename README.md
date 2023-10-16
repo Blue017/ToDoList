@@ -96,6 +96,23 @@ graph TD
     P -->|No| O
   ```
 
+## PROBLEMAS DURANTE EL DESARROLLO DEL PROGRAMA
+
+0. **Problema**: Error “conexión DB, error de conexión con base de datos” 
+
+   - **Solución**: El error se debía a que se accedía a la base de datos de mongo DB con una IP no validada en la base de datos para IP permitidas, la solución solo fue autorizar la nueva IP para la conexión a mongoDB Atlas  
+
+1. **Problema**: Error "Constructor TaskUpdateUI in class TaskUpdateUI cannot be applied to given types". 
+
+   - **Solución**: El error se debía a una incompatibilidad en los argumentos del constructor de `TaskUpdateUI`. Se agregó un nuevo argumento, pero al crear una instancia de `TaskUpdateUI`, no se pasó el argumento requerido, lo que causó el error. La solución consistió en ajustar la llamada al constructor para incluir el nuevo argumento necesario. 
+  
+2. **Problema**: Error "incompatible types: <anonymous Runnable> cannot be converted to TaskUI". 
+
+   - **Solución**: Este error ocurrió al intentar crear una instancia de `TaskUI` en un contexto donde se esperaba un objeto de tipo `TaskUI`. La solución consistió en asegurarse de que la creación de la instancia se realizara dentro de la clase `TaskUI` o que se creara en un contexto donde fuera válida. 
+  
+3. **Problema**: Error "not an enclosing class: TaskUI". 
+
+   - **Solución**: Este error se relacionó con la creación de una instancia de `TaskUI` en un contexto incorrecto. La solución implicó crear la instancia de `TaskUI` dentro del contexto adecuado, generalmente dentro de la propia clase `TaskUI`. 
 
 
 
