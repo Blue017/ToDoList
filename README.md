@@ -1,5 +1,19 @@
 # ToDoList - Aplicación de Lista de Tareas
 
+## Tabla de Contenido
+
+- [ToDoList - Aplicación de Lista de Tareas](#todolist---aplicación-de-lista-de-tareas)
+  - [Características](#características)
+  - [Requisitos previos](#requisitos-previos)
+  - [Instalación y Ejecución](#instalación-y-ejecución)
+  - [Instrucciones de Uso](#instrucciones-de-uso)
+  - [Configuración](#configuración)
+  - [DIAGRAMA BASE DE DATOS MONGO](#diagrama-base-de-datos-mongo)
+  - [Diagrama de la aplicación](#diagrama-de-la-aplicación)
+- [PROBLEMAS DURANTE EL DESARROLLO DEL PROGRAMA](#problemas-durante-el-desarrollo-del-programa)
+- [USO LIBRE Y FUTURAS APLICACIONES](#uso-libre-y-futuras-actualizaciones)
+
+
 
 
 ToDoList es una aplicación de lista de tareas simple que te permite gestionar tus tareas diarias. Puedes agregar, editar y eliminar tareas, así como marcarlas como completadas. La aplicación está escrita en Java y utiliza una base de datos MongoDB para almacenar tus tareas.
@@ -18,9 +32,11 @@ ToDoList es una aplicación de lista de tareas simple que te permite gestionar t
 
 Para ejecutar esta aplicación en tu máquina, debes tener instalados los siguientes requisitos:
 
-- [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-downloads.html)
+- [Java Development Kit (JDK) 17 o superior](https://www.oracle.com/java/technologies/javase-downloads.html)
 - [Maven](https://maven.apache.org/download.cgi)
 - [MongoDB](https://docs.mongodb.com/manual/installation/)
+
+Asegúrate de que tu entorno cumple con estos requisitos antes de continuar con la instalación.
 
 ## Instalación y Ejecución
 
@@ -57,6 +73,32 @@ spring.data.mongodb.port=27017
 spring.data.mongodb.database=todolist
 
 Asegúrate de que la base de datos configurada coincida con tu instancia de MongoDB.
+
+## Instrucciones de Uso
+
+Sigue estos pasos para empezar a utilizar la aplicación:
+
+1. **Registro e Inicio de Sesión**:
+   - Para usar la aplicación, puedes registrarte como usuario o iniciar sesión si ya tienes una cuenta.
+   
+2. **Agregar Listas**:
+   - Una vez que hayas iniciado sesión, puedes agregar nuevas listas que podrás usar posteriormente para agregar tareas.
+  
+3. **Agregar Tareas**:
+   - En cualquiera de tus listas puedes crear una tarea con una descripción y fecha de vencimiento.
+   
+5. **Editar Tareas**:
+   - Para editar una tarea existente, selecciona la tarea que deseas modificar y haz clic en la opción de edición correspondiente.
+   
+6. **Marcar Tareas como Completadas**:
+   - Cuando hayas completado una tarea, puedes marcarla como completada para mantener un registro de tus logros.
+   
+7. **Eliminar Tareas**:
+   - Si decides que una tarea ya no es relevante, puedes eliminarla de tu lista de tareas.
+   
+8. **Eliminar Listas de Tareas**:
+   - Si ya no necesitas una lista de tareas, puedes eliminarla junto con todas sus tareas.
+   
 
 ## DIAGRAMA BASE DE DATOS MONGO
 ![image](https://github.com/Blue017/ToDoList/assets/115097453/e3f2cfc6-7450-42d2-b065-f35f6e0061ba)
@@ -114,9 +156,13 @@ graph TD
 
    - **Solución**: Este error se relacionó con la creación de una instancia de `TaskUI` en un contexto incorrecto. La solución implicó crear la instancia de `TaskUI` dentro del contexto adecuado, generalmente dentro de la propia clase `TaskUI`. 
 
+## Uso Libre y Futuras Actualizaciones
 
+Esta aplicación, ToDoList, se proporciona de forma gratuita y abierta para su uso por cualquier persona que lo desee. Puedes descargar, modificar y utilizar esta aplicación de acuerdo con tus necesidades sin restricciones.
+
+Es importante tener en cuenta que actualmente no se esperan futuras actualizaciones para esta aplicación. Sin embargo, te animamos a utilizarla, personalizarla y, si lo deseas, contribuir con mejoras si tienes los conocimientos técnicos necesarios. La aplicación se proporciona "tal cual", y el equipo de desarrollo no se compromete a brindar soporte adicional o realizar actualizaciones futuras.
 
 Este proyecto ha sido desarrollado por
 
 [@CARLOSGRCIAGRCIA](https://github.com/CARLOSGRCIAGRCIA)
-
+[@Blue017](https://github.com/Blue017)
