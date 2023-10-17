@@ -236,7 +236,7 @@ public class TaskEditUI extends javax.swing.JFrame {
         .append("listName", listName);
 
     if (insertTaskIntoDatabase(document, collection)) {
-        JOptionPane.showMessageDialog(this, "Tarea insertada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Tarea creada con exito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
         clearFields();
 

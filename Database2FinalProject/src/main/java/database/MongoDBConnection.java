@@ -5,7 +5,7 @@ import com.mongodb.client.MongoDatabase;
 
 public class MongoDBConnection {
     private static final String MONGODB_URI = "mongodb+srv://carlosGG:16LSZHC9riwyKF3K@cluster0.jwjnejd.mongodb.net/?retryWrites=true&w=majority";
-    private static final String DATABASE_NAME = "University";
+    private static final String DATABASE_NAME = "ToDoList";
 
     public static MongoClient connect() {
         return MongoClients.create(MONGODB_URI);
